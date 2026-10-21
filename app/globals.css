@@ -1,26 +1,209 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Profession (light) */
+  --background: #fbfcfe;
+  --background-alt: #f8fafc;
+  --border: #e2e8f0;
+  --accent: #0ea5e9;
+  --accent-dark: #0284c7;
+  --warm: #f59e0b;
+  --foreground: #0f172a;
+  --secondary: #475569;
+  --muted: #94a3b8;
+
+  /* Passion (dark editorial) */
+  --ink: #0c0a09;
+  --ink-2: #15110e;
+  --ink-3: #1d1814;
+  --ivory: #f4ece0;
+  --ivory-dim: rgba(244, 236, 224, 0.62);
+  --ivory-faint: rgba(244, 236, 224, 0.38);
+  --line: rgba(244, 236, 224, 0.09);
+  --gold: #d6b37a;
+  --gold-deep: #a8834a;
+  --rose: #e9a28c;
+  --neon: #ffd9a0;
+  --neon-head: #fff6e6;
+  --scroll-thumb: #3a3029;
+}
+
+/* Passion palettes — picked via the floating switcher (body[data-palette]). Default above is "Gilded Noir". */
+body[data-palette="henna"] {
+  --ink: #1a0f0a;
+  --ink-2: #241610;
+  --ink-3: #2f1d15;
+  --ivory: #f6ead8;
+  --ivory-dim: rgba(246, 234, 216, 0.64);
+  --ivory-faint: rgba(246, 234, 216, 0.4);
+  --line: rgba(246, 234, 216, 0.1);
+  --gold: #e8b04b;
+  --gold-deep: #b9822a;
+  --rose: #c8553d;
+  --neon: #ffc978;
+  --neon-head: #fff2dc;
+  --scroll-thumb: #4a2e22;
+}
+body[data-palette="peacock"] {
+  --ink: #0b1a1e;
+  --ink-2: #102328;
+  --ink-3: #162d33;
+  --ivory: #f1ede4;
+  --ivory-dim: rgba(241, 237, 228, 0.64);
+  --ivory-faint: rgba(241, 237, 228, 0.4);
+  --line: rgba(241, 237, 228, 0.1);
+  --gold: #1fa39a;
+  --gold-deep: #157a73;
+  --rose: #e0a43a;
+  --neon: #6fe3d8;
+  --neon-head: #e8fffc;
+  --scroll-thumb: #22424a;
+}
+body[data-palette="sunset"] {
+  --ink: #160d1f;
+  --ink-2: #1f1429;
+  --ink-3: #2a1c36;
+  --ivory: #fbeee6;
+  --ivory-dim: rgba(251, 238, 230, 0.66);
+  --ivory-faint: rgba(251, 238, 230, 0.42);
+  --line: rgba(251, 238, 230, 0.1);
+  --gold: #ff7a59;
+  --gold-deep: #d9583a;
+  --rose: #f4c26b;
+  --neon: #ffb199;
+  --neon-head: #fff1ea;
+  --scroll-thumb: #43304f;
+}
+body[data-palette="editorial"] {
+  --ink: #f3ede3;
+  --ink-2: #ebe3d6;
+  --ink-3: #e1d7c7;
+  --ivory: #1c1714;
+  --ivory-dim: rgba(28, 23, 20, 0.7);
+  --ivory-faint: rgba(28, 23, 20, 0.48);
+  --line: rgba(28, 23, 20, 0.12);
+  --gold: #b4432f;
+  --gold-deep: #8e3322;
+  --rose: #2f5d50;
+  --neon: #d9634c;
+  --neon-head: #fff;
+  --scroll-thumb: #c9bca8;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-alt: var(--background-alt);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
+  --color-warm: var(--warm);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ivory: var(--ivory);
+  --color-ivory-dim: var(--ivory-dim);
+  --color-ivory-faint: var(--ivory-faint);
+  --color-line: var(--line);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-rose: var(--rose);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-fraunces);
+
+  --animate-marquee: marquee 60s linear infinite;
+  --animate-marquee-fast: marquee 38s linear infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #fbfcfe;
+  color: #0f172a;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body[data-mode="passion"] {
+  background-color: var(--ink);
+  color: var(--ivory);
+}
+
+.font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+}
+
+/* Gold gradient text */
+.text-gilded {
+  background: linear-gradient(100deg, var(--ivory) 0%, var(--gold) 45%, var(--rose) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* Room for italic overhang, which background-clip would otherwise cut off */
+  padding-right: 0.12em;
+  margin-right: -0.06em;
+}
+
+/* Subtle film grain over the dark theme */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Premium link underline */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-underline:hover {
+  background-size: 100% 1px;
+}
+
+::selection {
+  background-color: rgba(14, 165, 233, 0.15);
+}
+body[data-mode="passion"] ::selection {
+  background-color: color-mix(in srgb, var(--gold) 35%, transparent);
+  color: var(--ivory);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+body[data-mode="passion"]::-webkit-scrollbar-thumb,
+body[data-mode="passion"] ::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-fast {
+    animation: none;
+  }
 }
