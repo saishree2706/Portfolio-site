@@ -49,7 +49,7 @@ export default function PaletteSwitcher() {
   }
 
   return (
-    <div className="fixed bottom-24 left-6 z-50">
+    <div className="fixed bottom-6 right-5 md:bottom-24 md:right-auto md:left-6 z-50">
       <AnimatePresence>
         {open && (
           <motion.div
@@ -57,7 +57,7 @@ export default function PaletteSwitcher() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.96 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-16 left-0 w-72 rounded-2xl border border-line bg-ink-2/95 backdrop-blur-xl p-3 shadow-2xl"
+            className="absolute bottom-16 right-0 md:right-auto md:left-0 w-72 rounded-2xl border border-line bg-ink-2/95 backdrop-blur-xl p-3 shadow-2xl"
           >
             <div className="flex items-center justify-between px-2 pb-2">
               <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-ivory-faint">Colour palette</p>

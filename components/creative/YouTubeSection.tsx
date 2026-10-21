@@ -6,6 +6,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { YouTubeApiResponse } from "@/app/api/youtube/route";
 import { SOCIALS, TRAVEL_PHOTOS, PROFILE, YOUTUBE_VIDEOS } from "@/data/site";
 import { EASE, SectionHeader } from "./SectionHeader";
+import SwipeDeck from "./SwipeDeck";
 
 const CHANNEL_URL = SOCIALS.youtube;
 const FALLBACK_PHOTOS = [...TRAVEL_PHOTOS, PROFILE.photo];
@@ -93,6 +94,46 @@ function VideoCard({ card, idx, featured }: { card: Card; idx: number; featured?
   );
 }
 
+/** Portrait card for the mobile swipe deck: thumbnail on top, title below, on one solid surface. */
+function DeckVideoCard({ card, idx }: { card: Card; idx: number }) {
+  return (
+    <div className="flex h-full flex-col overflow-hidden rounded-[22px] bg-ink-3 ring-1 ring-line shadow-2xl shadow-black/40">
+      <div className="relative aspect-video shrink-0 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={card.thumb}
+          alt={card.title}
+          draggable={false}
+          onError={(e) => {
+            const img = e.currentTarget;
+            if (img.src.includes("maxresdefault")) img.src = img.src.replace("maxresdefault", "hqdefault");
+          }}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <PlayDisc />
+        </div>
+        {!!card.views && (
+          <div className="absolute bottom-3 right-3 rounded-full bg-ink/75 backdrop-blur-md px-2.5 py-1 font-mono text-[10px] tracking-[0.12em] uppercase text-ivory">
+            {formatCount(card.views)} views
+          </div>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col justify-between gap-4 p-5">
+        <div>
+          <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-ivory-faint mb-2">
+            {String(idx + 1).padStart(2, "0")} / {card.meta}
+          </p>
+          <h3 className="font-display font-light text-ivory text-xl leading-snug line-clamp-3">{card.title}</h3>
+        </div>
+        <p className="flex items-center gap-2 text-xs font-medium text-gold">
+          <YoutubeIcon size={14} /> Watch on YouTube <ArrowUpRight size={14} />
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function SkeletonCard({ featured }: { featured?: boolean }) {
   return <div className={`rounded-md bg-ivory/[0.04] animate-pulse aspect-video ${featured ? "md:col-span-2 md:row-span-2 md:aspect-auto md:min-h-[420px]" : ""}`} />;
 }
@@ -155,7 +196,22 @@ export default function YouTubeSection() {
           }
         />
 
-        <div className="grid md:grid-cols-4 gap-x-6 gap-y-10">
+        {/* Mobile: swipeable card stack */}
+        <div className="md:hidden">
+          {loading ? (
+            <div className="mx-auto w-[min(84vw,360px)] h-[400px] rounded-[22px] bg-ivory/[0.04] animate-pulse" />
+          ) : (
+            <SwipeDeck
+              items={cards}
+              getHref={(c) => c.href}
+              getLabel={(c) => c.title}
+              renderCard={(c) => <DeckVideoCard card={c} idx={cards.indexOf(c)} />}
+              className="mx-auto w-[min(84vw,360px)] h-[400px]"
+            />
+          )}
+        </div>
+
+        <div className="hidden md:grid grid-cols-4 gap-x-6 gap-y-10">
           {loading
             ? Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} featured={i === 0} />)
             : cards.map((c, i) => <VideoCard key={c.key} card={c} idx={i} featured={i === 0} />)}

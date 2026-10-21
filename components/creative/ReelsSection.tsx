@@ -7,6 +7,7 @@ import type { InstagramMedia, ReelsApiResponse } from "@/app/api/instagram/route
 import type { YouTubeApiResponse, YouTubeVideo } from "@/app/api/youtube/route";
 import { EASE, SectionHeader } from "./SectionHeader";
 import { shortTitle } from "./YouTubeSection";
+import SwipeDeck from "./SwipeDeck";
 import { PASSION, REELS_FALLBACK, SOCIALS, TRAVEL_PHOTOS } from "@/data/site";
 
 const INSTAGRAM_URL = SOCIALS.instagram;
@@ -72,8 +73,6 @@ function InstagramIcon({ size = 14 }: { size?: number }) {
 }
 
 function ReelCard({ reel, idx }: { reel: Reel; idx: number }) {
-  const [broken, setBroken] = useState(false);
-
   return (
     <motion.a
       href={reel.href}
@@ -85,41 +84,50 @@ function ReelCard({ reel, idx }: { reel: Reel; idx: number }) {
       transition={{ duration: 0.8, delay: idx * 0.08, ease: EASE }}
       className={`group block ${idx % 2 === 1 ? "md:translate-y-16" : ""}`}
     >
-      <div className="relative aspect-[9/16] overflow-hidden rounded-[22px] bg-ink-3 ring-1 ring-line">
-        {/* Instagram CDN links are signed and expire; fall back to a local photo */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={!reel.thumb || broken ? FALLBACK_PHOTOS[idx % FALLBACK_PHOTOS.length] : reel.thumb}
-          alt={reel.caption}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          onError={() => setBroken(true)}
-          className={`absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-[1400ms] ease-out ${broken ? "grayscale-[40%] brightness-75" : ""}`}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/10 to-ink/30" />
+      <ReelVisual reel={reel} idx={idx} />
+    </motion.a>
+  );
+}
 
-        <div className="absolute top-4 inset-x-4 flex items-center justify-between font-mono text-[10px] tracking-[0.2em] uppercase text-ivory/70">
-          {reel.platform === "youtube" ? (
-            <span className="flex items-center gap-1.5"><YoutubeIcon size={12} /> Short</span>
-          ) : (
-            <span className="flex items-center gap-1.5"><InstagramIcon size={12} /> Reel</span>
-          )}
-          {reel.date && <span>{reel.date}</span>}
-        </div>
+function ReelVisual({ reel, idx, className }: { reel: Reel; idx: number; className?: string }) {
+  const [broken, setBroken] = useState(false);
 
-        <div className="absolute bottom-0 inset-x-0 p-5 space-y-3">
-          {reel.views > 0 && (
-            <p className="font-display text-3xl font-light text-ivory">
-              {formatViews(reel.views)} <span className="font-sans text-[10px] tracking-[0.2em] uppercase text-ivory/50 align-middle">views</span>
-            </p>
-          )}
-          <div className="flex items-end justify-between gap-3">
-            <p className="text-[13px] leading-snug text-ivory/85 line-clamp-2">{reel.caption}</p>
-            <ArrowUpRight size={16} className="shrink-0 text-ivory/40 group-hover:text-gold transition-colors" />
-          </div>
+  return (
+    <div className={`group relative aspect-[9/16] overflow-hidden rounded-[22px] bg-ink-3 ring-1 ring-line ${className ?? ""}`}>
+      {/* Instagram CDN links are signed and expire; fall back to a local photo */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={!reel.thumb || broken ? FALLBACK_PHOTOS[idx % FALLBACK_PHOTOS.length] : reel.thumb}
+        alt={reel.caption}
+        loading="lazy"
+        draggable={false}
+        referrerPolicy="no-referrer"
+        onError={() => setBroken(true)}
+        className={`absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-[1400ms] ease-out ${broken ? "grayscale-[40%] brightness-75" : ""}`}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/10 to-ink/30" />
+
+      <div className="absolute top-4 inset-x-4 flex items-center justify-between font-mono text-[10px] tracking-[0.2em] uppercase text-ivory/70">
+        {reel.platform === "youtube" ? (
+          <span className="flex items-center gap-1.5"><YoutubeIcon size={12} /> Short</span>
+        ) : (
+          <span className="flex items-center gap-1.5"><InstagramIcon size={12} /> Reel</span>
+        )}
+        {reel.date && <span>{reel.date}</span>}
+      </div>
+
+      <div className="absolute bottom-0 inset-x-0 p-5 space-y-3">
+        {reel.views > 0 && (
+          <p className="font-display text-3xl font-light text-ivory">
+            {formatViews(reel.views)} <span className="font-sans text-[10px] tracking-[0.2em] uppercase text-ivory/50 align-middle">views</span>
+          </p>
+        )}
+        <div className="flex items-end justify-between gap-3">
+          <p className="text-[13px] leading-snug text-ivory/85 line-clamp-2">{reel.caption}</p>
+          <ArrowUpRight size={16} className="shrink-0 text-ivory/40 group-hover:text-gold transition-colors" />
         </div>
       </div>
-    </motion.a>
+    </div>
   );
 }
 
@@ -211,7 +219,23 @@ export default function ReelsSection() {
           )}
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 md:pb-16">
+        {/* Mobile: swipeable card stack */}
+        <div className="md:hidden">
+          {loading ? (
+            <div className="mx-auto w-[min(72vw,300px)] aspect-[9/16] rounded-[22px] bg-ivory/[0.04] animate-pulse" />
+          ) : (
+            <SwipeDeck
+              key={tab}
+              items={reels}
+              getHref={(r) => r.href}
+              getLabel={(r) => r.caption}
+              renderCard={(r) => <ReelVisual reel={r} idx={reels.indexOf(r)} className="h-full shadow-2xl shadow-black/40" />}
+              className="mx-auto w-[min(72vw,300px)] aspect-[9/16]"
+            />
+          )}
+        </div>
+
+        <div className="hidden md:grid grid-cols-4 gap-6 pb-16">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className={`aspect-[9/16] rounded-[22px] bg-ivory/[0.04] animate-pulse ${i % 2 ? "md:translate-y-16" : ""}`} />
